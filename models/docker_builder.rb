@@ -27,9 +27,10 @@ class DockerBuilder < Jenkins::Tasks::Builder
     # @param [Jenkins::Launcher] launcher the launcher that can run code on the node running this build
     # @param [Jenkins::Model::Listener] listener the listener for this build.
     def perform(build, launcher, listener)
+      workspace = build.send(:native).workspace.to_s
+
       # actually perform the build step
-      listener.fatal "fataaaaaal"
-      build.abort "lolol #{@dockerfile_path}"
+      launcher.execute("docker", "build", "#{workspace}/#@dockerfile_path", { :out => listener })
     end
 
 end
