@@ -1,12 +1,14 @@
 
 class DockerBuilder < Jenkins::Tasks::Builder
 
+    attr_accessor :dockerfile_path
+
     display_name "Docker builder"
 
     # Invoked with the form parameters when this extension point
     # is created from a configuration screen.
     def initialize(attrs = {})
-
+        @dockerfile_path = attrs["dockerfile_path"]
     end
 
     ##
@@ -26,6 +28,8 @@ class DockerBuilder < Jenkins::Tasks::Builder
     # @param [Jenkins::Model::Listener] listener the listener for this build.
     def perform(build, launcher, listener)
       # actually perform the build step
+      listener.fatal "fataaaaaal"
+      build.abort "lolol #{@dockerfile_path}"
     end
 
 end

@@ -1,0 +1,11 @@
+<%
+
+f = taglib("/lib/form")
+
+f.block do
+  f.entry(:title => "Path to Dockerfile", :field => "dockerfile_path") do
+    f.textbox
+  end
+end
+
+%>

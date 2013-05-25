@@ -1,10 +1,21 @@
+file { "/etc/apt/sources.list.d/jenkins-docker-plugin.list":
+    content => "deb http://ppa.launchpad.net/dotcloud/lxc-docker/ubuntu precise main",
+}
+
+exec { "ppa key":
+    command     => "/usr/bin/apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 63561DC6",
+    subscribe   => File["/etc/apt/sources.list.d/jenkins-docker-plugin.list"],
+    refreshonly => true,
+}
 
 exec { "apt-get update":
-  path => "/usr/bin",
+  path    => "/usr/bin",
+  require => File["/etc/apt/sources.list.d/jenkins-docker-plugin.list"],
 }
+
 Exec["apt-get update"] -> Package <| |>
 
-package { ["git", "rbenv", "openjdk-7-jre", "build-essential"]:
+package { ["git", "rbenv", "openjdk-7-jre", "build-essential", "lxc-docker", "linux-image-generic-lts-raring"]:
     ensure => installed,
 }
 
@@ -15,12 +26,12 @@ exec { "clone ruby-build":
 }
 
 exec { "install jruby":
-    command => "/home/vagrant/ruby-build/bin/ruby-build jruby-1.7.4 /home/vagrant/.rbenv/versions/jruby-1.7.4",
-    creates => "/home/vagrant/.rbenv/versions/jruby-1.7.4",
+    command => "/home/vagrant/ruby-build/bin/ruby-build jruby-1.7.3 /home/vagrant/.rbenv/versions/jruby-1.7.3",
+    creates => "/home/vagrant/.rbenv/versions/jruby-1.7.3",
     require => [Package["rbenv", "openjdk-7-jre", "build-essential"], Exec["clone ruby-build"]],
 }
 
-exec { "/usr/bin/rbenv global jruby-1.7.4":
+exec { "/usr/bin/rbenv global jruby-1.7.3":
     require => Exec["install jruby"],
 }
 
@@ -30,6 +41,6 @@ file { "/etc/profile.d/rbenv.sh":
 
 exec { "install jpi":
     command => "/home/vagrant/.rbenv/shims/gem install jpi",
-    onlyif  => "/usr/bin/test ! -d /home/vagrant/.rbenv/versions/jruby-1.7.4/lib/ruby/gems/shared/gems/jpi-*/",
+    onlyif  => "/usr/bin/test ! -d /home/vagrant/.rbenv/versions/jruby-1.7.3/lib/ruby/gems/shared/gems/jpi-*/",
 }
 
