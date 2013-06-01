@@ -1,14 +1,15 @@
 
 class DockerBuilder < Jenkins::Tasks::Builder
+    display_name "Build docker container from Dockerfile"
 
     attr_accessor :dockerfile_path
-
-    display_name "Docker builder"
+    attr_accessor :tag
 
     # Invoked with the form parameters when this extension point
     # is created from a configuration screen.
     def initialize(attrs = {})
         @dockerfile_path = attrs["dockerfile_path"]
+        @tag = attrs["tag"]
     end
 
     ##
@@ -30,7 +31,13 @@ class DockerBuilder < Jenkins::Tasks::Builder
       workspace = build.send(:native).workspace.to_s
 
       # actually perform the build step
-      launcher.execute("docker", "build", "#{workspace}/#@dockerfile_path", { :out => listener })
+      cmd_path = @dockerfile_path.gsub(/\/Dockerfile$/, '') # docker build wants path, not filename
+      cmd = %w{docker build}
+      cmd << "-t #@tag" unless @tag.nil? || @tag.empty?
+      cmd << "\'#{workspace}/#{cmd_path}\'"
+      if launcher.execute(*cmd.join(' '), { :out => listener }) != 0
+        build.abort "docker build failed"
+      end
     end
 
 end

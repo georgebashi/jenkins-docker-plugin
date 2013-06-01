@@ -6,6 +6,9 @@ f.block do
   f.entry(:title => "Path to Dockerfile", :field => "dockerfile_path") do
     f.textbox
   end
+  f.entry(:title => "Tag to be applied to the resulting image (blank for none)", :field => "tag") do
+    f.textbox
+  end
 end
 
 %>
